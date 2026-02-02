@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Be My Valentine?</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #fce4ec; /* Light pink background */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden; /* Prevents scrolling when button moves */
+            text-align: center;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* New "Box" style for content */
+        .content-box {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        img {
+            width: 150px;
+            height: auto;
+            /* border-radius: 15px;  Removed for the ladybug-in-a-box look */
+            margin-bottom: 15px;
+            /* box-shadow: 0 4px 15px rgba(0,0,0,0.1); Removed shadow from image itself */
+        }
+
+        .name-text {
+            color: #c2185b;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: #d81b60;
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            position: relative; /* Needed for the No button to move relative to this or the body */
+            min-height: 60px; /* Ensures space for buttons */
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            -webkit-tap-highlight-color: transparent; /* Removes blue box on iPhone tap */
+        }
+
+        #yesBtn {
+            background-color: #4CAF50; /* Green */
+            color: white;
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+            z-index: 10; /* Keeps Yes button on top */
+        }
+
+        #noBtn {
+            background-color: #e53935; /* Red */
+            color: white;
+            box-shadow: 0 4px 10px rgba(229, 57, 53, 0.3);
+            transition: transform 0.3s ease, background-color 0.3s ease; /* Smooth transition for other props, not position */
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #success-message {
+            color: #d81b60;
+            font-size: 28px;
+            font-weight: bold;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="main-content">
+        <div class="content-box">
+            <img id="main-image" src="ladybug.png" alt="Cute Ladybug with heart antennas">
+            
+            <div class="name-text">Iris Areli Vargas Rosales</div>
+            <h1>Will you be my Valentine?</h1>
+        </div>
+        
+        <div class="buttons">
+            <button id="yesBtn">Yes</button>
+            <button id="noBtn">No</button>
+        </div>
+    </div>
+
+    <div id="success-message" class="hidden">
+        I knew you'd say yes! ❤️<br>
+        Let's have Valentine's day free for both of us! <br>
+        Con cariño, Luz Cabrera
+    </div>
+
+    <script>
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const mainContent = document.getElementById('main-content');
+        const successMessage = document.getElementById('success-message');
+        
+        let yesScale = 1;
+
+        // Function to move the 'No' button
+        noBtn.addEventListener('click', () => {
+            // 1. Make Yes button bigger
+            yesScale += 0.2;
+            yesBtn.style.transform = `scale(${yesScale})`;
+
+            // 2. Move No button to a random position
+            // Get the viewport dimensions
+            const maxWidth = window.innerWidth - noBtn.offsetWidth;
+            const maxHeight = window.innerHeight - noBtn.offsetHeight;
+
+            // Generate random positions
+            const randomX = Math.random() * maxWidth;
+            const randomY = Math.random() * maxHeight;
+
+            // Apply the new position
+            noBtn.style.position = 'fixed'; // Use fixed to position relative to the viewport
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
+        });
+
+        // Function for the 'Yes' button
+        yesBtn.addEventListener('click', () => {
+            // Hide the question and buttons
+            mainContent.classList.add('hidden');
+            
+            // Show the success message
+            successMessage.classList.remove('hidden');
+
+            // Trigger Confetti
+            launchConfetti();
+        });
+
+        function launchConfetti() {
+            var duration = 3 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            var randomInRange = (min, max) => Math.random() * (max - min) + min;
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                var particleCount = 50 * (timeLeft / duration);
+                
+                // Create confetti from left and right corners
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+    </script>
+</body>
+</html>
